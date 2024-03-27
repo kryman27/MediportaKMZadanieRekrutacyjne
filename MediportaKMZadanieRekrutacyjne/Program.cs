@@ -1,5 +1,6 @@
 using MediportaKMZadanieRekrutacyjne.Config;
 using MediportaKMZadanieRekrutacyjne.Services;
+using System.Diagnostics;
 
 public class Program
 {
@@ -33,7 +34,24 @@ public class Program
 
 
         //initial checking of tags database and retrive data from StackExchangeAPI
-        InitialConfigurator.CheckDbRetriveDataFromApi();
+        var configuration = MediportaKMZadanieRekrutacyjne.Config.ConfigurationManager.GetInstance().appConfiguration;
+
+        Console.WriteLine("Downloading tags started");
+        Stopwatch stopwatch = new Stopwatch();
+        stopwatch.Start();
+        InitialConfigurator.CheckDbRetriveDataFromApi(configuration);
+        stopwatch.Stop();
+        var timeElapsed = stopwatch.Elapsed.TotalSeconds;
+        Console.WriteLine($"Download completed in {timeElapsed} seconds");
+        MediportaKMZadanieRekrutacyjne.Config.ConfigurationManager.ChangeConfigurationFile();
+
+        //uruchomDrugiProgramCoDoci¹gaTagi(configuration)
+        Process process = new Process();
+        process.StartInfo.FileName = "cmd.exe";
+        process.StartInfo.Arguments = $"/C {Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TagsDownloader.exe")}";
+        process.StartInfo.UseShellExecute = true;
+        process.Start();
+
 
         app.Run();
     }

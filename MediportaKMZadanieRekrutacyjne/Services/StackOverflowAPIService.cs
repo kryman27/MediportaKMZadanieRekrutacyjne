@@ -1,16 +1,16 @@
-﻿using MediportaKMZadanieRekrutacyjne.Models;
+﻿using MediportaKMZadanieRekrutacyjne.Config;
+using MediportaKMZadanieRekrutacyjne.Models;
 using Microsoft.AspNetCore.ResponseCompression;
 using System.IO.Compression;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using ConfigurationManager = MediportaKMZadanieRekrutacyjne.Config.ConfigurationManager;
 
 namespace MediportaKMZadanieRekrutacyjne.Services
 {
     public class StackOverflowAPIService
     {
-        //private string apiUrl = "https://api.stackexchange.com/2.3/tags?page=1&order=asc&sort=name&site=stackoverflow";
-
         public async Task<APIResponseModel> GetTags(int pageNumber)
         {
             APIResponseModel result = null;
@@ -25,21 +25,12 @@ namespace MediportaKMZadanieRekrutacyjne.Services
 
                 using (var client = new HttpClient(handler))
                 {
-                    var url = $"https://api.stackexchange.com/2.3/tags?page={pageNumber}&order=asc&sort=name&site=stackoverflow&key=Hcl6TN1VjfObT)ahuHhKMA((";
-                    var responseString = await client.GetStringAsync(url);
+                    var url = ConfigurationManager.GetInstance().appConfiguration.ApiUrl;
+                    var finalUrl = url.Replace("PAGENUMBERVALUE", pageNumber.ToString());
 
-                    Console.WriteLine(responseString);
+                    var responseString = await client.GetStringAsync(finalUrl);
+
                     result = JsonSerializer.Deserialize<APIResponseModel>(responseString);
-
-
-                    //var request = new HttpRequestMessage(HttpMethod.Get, url);
-                    //request.Headers.Add("key", "Hcl6TN1VjfObT)ahuHhKMA((");
-
-                    //var response = await client.SendAsync(request);
-                    //var rawResult = await response.Content.ReadAsStringAsync();
-                    //Console.WriteLine(rawResult);
-                    //result = JsonSerializer.Deserialize<APIResponseModel>(rawResult);
-
 
                     return result;
                 }

@@ -9,24 +9,25 @@ namespace MediportaKMZadanieRekrutacyjne.Config
         /// <summary>
         /// Method allows to retrive TAGS from StackExchangeAPI
         /// </summary>
-        public static void CheckDbRetriveDataFromApi()
+        public static void CheckDbRetriveDataFromApi(Configuration config)
         {
             try
             {
                 List<Tag> tags = new();
                 bool hasMoreFlag = true;
-
+                
                 //TODO - this should not be hardcoded here as 24!
-                int currentPage = 24;
+                int currentPage = ConfigurationManager.GetInstance().appConfiguration.CurrentPage;
+                int pagesLimiter = currentPage + 5;
 
                 using (SoApiDbContext dbCtx = new())
                 {
-                    if (dbCtx.Tags.Count() == 0)
+                    if (ConfigurationManager.GetInstance().appConfiguration.FirstLaunchFlag || dbCtx.Tags.Count() == 0)
                     {
                         var soService = new StackOverflowAPIService();
 
                         //TODO - consider second condition, is this constriction neccessary?
-                        while (hasMoreFlag && currentPage < 28)
+                        while (hasMoreFlag && currentPage <= pagesLimiter)
                         {
                             var retrievedTags = soService.GetTags(currentPage);
 
@@ -49,6 +50,7 @@ namespace MediportaKMZadanieRekrutacyjne.Config
 
                         dbCtx.Tags.AddRange(tags);
                         dbCtx.SaveChanges();
+                        ConfigurationManager.GetInstance().appConfiguration.CurrentPage = currentPage;
                     }
                 }
             }

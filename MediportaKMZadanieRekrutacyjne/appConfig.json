@@ -1,7 +1,7 @@
 {
   "FirstLaunchFlag": true,
-  "ApiKey": "1fbbb6d5c387118d530fa1c4232d405798cc6479025741838252d02eca3833d6",
-  //"ApiKey": "Hcl6TN1VjfObT)ahuHhKMA((",
+  "ApiKey": "Hcl6TN1VjfObT)ahuHhKMA((",
   "DbConnectionString": "Server=(localdb)\\MSSQLLocalDB;Database=SODB;Trusted_Connection=True;",
-  "ApiUrl": "https://api.stackexchange.com/2.3/tags?page=pageNumberValue&order=asc&sort=name&site=stackoverflow&key=keyValue"
+  "ApiUrl": "https://api.stackexchange.com/2.3/tags?page=PAGENUMBERVALUE&order=asc&sort=name&site=stackoverflow&key=APIKEYVALUE",
+  "CurrentPage": 1
 }
