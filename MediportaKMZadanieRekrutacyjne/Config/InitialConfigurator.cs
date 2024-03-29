@@ -18,7 +18,7 @@ namespace MediportaKMZadanieRekrutacyjne.Config
                 
                 //TODO - this should not be hardcoded here as 24!
                 int currentPage = ConfigurationManager.GetInstance().appConfiguration.CurrentPage;
-                int pagesLimiter = currentPage + 5;
+                int pagesLimiter = currentPage + 50;
 
                 using (SoApiDbContext dbCtx = new())
                 {
@@ -57,6 +57,26 @@ namespace MediportaKMZadanieRekrutacyjne.Config
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
+            }
+        }
+
+        public static void CalculateTagsPercentage()
+        {
+            int totalTagsCount;
+
+            using(SoApiDbContext dbCtx = new())
+            {
+                totalTagsCount = dbCtx.Tags.Sum(t => t.Count);
+
+                var tags = dbCtx.Tags;
+
+                foreach (var tag in tags)
+                {
+                    tag.PopulationPercentage = Math.Round(((decimal)tag.Count / (decimal)totalTagsCount) * 100.00m, 5);
+
+                    dbCtx.Tags.Update(tag);
+                }
+                dbCtx.SaveChanges();
             }
         }
     }

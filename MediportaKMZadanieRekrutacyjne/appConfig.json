@@ -1,7 +1,7 @@
 {
   "FirstLaunchFlag": true,
   "ApiKey": "Hcl6TN1VjfObT)ahuHhKMA((",
-  "DbConnectionString": "Server=(localdb)\\MSSQLLocalDB;Database=SODB;Trusted_Connection=True;",
+  "DbConnectionString": "Server=localhost;Database=SODB;User Id=sa;Password=admin1234;",
   "ApiUrl": "https://api.stackexchange.com/2.3/tags?page=PAGENUMBERVALUE&order=asc&sort=name&site=stackoverflow&key=APIKEYVALUE",
   "CurrentPage": 1
 }

@@ -1,16 +1,19 @@
-﻿using MediportaKMZadanieRekrutacyjne.Config;
-using MediportaKMZadanieRekrutacyjne.Models;
-using Microsoft.AspNetCore.ResponseCompression;
-using System.IO.Compression;
-using System.Text;
+﻿using MediportaKMZadanieRekrutacyjne.Models;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using ConfigurationManager = MediportaKMZadanieRekrutacyjne.Config.ConfigurationManager;
 
 namespace MediportaKMZadanieRekrutacyjne.Services
 {
     public class StackOverflowAPIService
     {
+        ILoggerFactory loggerFactory = new LoggerFactory();
+        ILogger<APIResponseModel> logger;
+
+        public StackOverflowAPIService()
+        {
+            logger = loggerFactory.CreateLogger<APIResponseModel>();
+        }
+
         public async Task<APIResponseModel> GetTags(int pageNumber)
         {
             APIResponseModel result = null;
@@ -37,7 +40,7 @@ namespace MediportaKMZadanieRekrutacyjne.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                logger.LogError(ex.Message);
             }
             return null;
         }

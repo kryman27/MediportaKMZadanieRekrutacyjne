@@ -1,0 +1,17 @@
+﻿version: '3.4'
+services:
+  your-app:
+    image: mediportakmzadanierekrutacyjne
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:80"
+  db:
+    image: "mcr.microsoft.com/mssql/server"
+    environment:
+      SA_PASSWORD: "admin1234"
+      ACCEPT_EULA: "Y"
+    volumes:
+      - ./init-db.ps1:/docker-entrypoint-initdb.d/init-db.ps1
+    command: ["powershell", "/docker-entrypoint-initdb.d/init-db.ps1"]
