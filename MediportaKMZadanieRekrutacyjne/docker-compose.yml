@@ -7,11 +7,8 @@ services:
       ACCEPT_EULA: "Y"
     ports:
       - 1433:1433
-    volumes:
-      - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
-      - ./setup.sql:/docker-entrypoint-initdb.d/setup.sql
-  your-app:
-    image: mediportaapi
+  api:
+    image: api
     build:
       context: .
       dockerfile: Dockerfile

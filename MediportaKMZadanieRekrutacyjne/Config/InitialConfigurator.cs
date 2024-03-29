@@ -3,6 +3,9 @@ using MediportaKMZadanieRekrutacyjne.Models;
 using MediportaKMZadanieRekrutacyjne.Services;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.IdentityModel.Tokens;
 
 namespace MediportaKMZadanieRekrutacyjne.Config
 {
@@ -14,34 +17,10 @@ namespace MediportaKMZadanieRekrutacyjne.Config
             {
                 if (config.FirstLaunchFlag)
                 {
-                    //string rawSql = "CREATE DATABASE SODB;\r\nGO\r\nUSE SODB;\r\nGO\r\nCREATE TABLE [dbo].[Tags] (\r\n    [TagID]                INT            IDENTITY (1, 1) NOT NULL,\r\n    [HasSynonyms]          BIT            NOT NULL,\r\n    [IsModeratorOnly]      BIT            NOT NULL,\r\n    [IsRequired]           BIT            NOT NULL,\r\n    [Count]                INT            NOT NULL,\r\n    [Name]                 NVARCHAR (MAX) NULL,\r\n    [PopulationPercentage] DECIMAL (7, 5) NULL\r\n);\r\nGO";
-
-                    string createDBquery = "CREATE DATABASE SODB;";
-                    string createTableQuery = "USE SODB; CREATE TABLE [dbo].[Tags] ([TagID] INT IDENTITY (1, 1) NOT NULL, [HasSynonyms] BIT NOT NULL, [IsModeratorOnly] BIT NOT NULL, [IsRequired] BIT NOT NULL, [Count] INT NOT NULL, [Name] NVARCHAR (MAX) NULL, [PopulationPercentage] DECIMAL (7, 5) NULL);";
-
                     using (SoApiDbContext dbCtx = new())
                     {
-                        dbCtx.Database.SetConnectionString(config.SQLServerConnectionString);
-                        
-                        if(!dbCtx.Database.CanConnect())
-                        {
-                            dbCtx.Database.ExecuteSqlRaw(createDBquery);
-                            dbCtx.SaveChanges();
-                        }
-
-                        dbCtx.Database.ExecuteSqlRaw(createTableQuery);
-                        dbCtx.SaveChanges();
+                        var dbCreateFlag = dbCtx.Database.EnsureCreated();
                     }
-
-                    //using (SqlConnection connection = new SqlConnection(config.SQLServerConnectionString))
-                    //{
-                    //    connection.Open();
-
-                    //    using(SqlCommand command = new(rawSql, connection))
-                    //    {
-                    //        var temp = command.ExecuteNonQuery();
-                    //    }
-                    //}
                 }
             }
             catch (Exception ex)

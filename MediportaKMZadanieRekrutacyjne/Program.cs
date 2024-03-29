@@ -38,7 +38,10 @@ public class Program
         //initial checking of tags database and retrive data from StackExchangeAPI
         var configuration = MediportaKMZadanieRekrutacyjne.Config.ConfigurationManager.GetInstance().appConfiguration;
 
+        app.Logger.LogInformation("Database initiating started");
         InitialConfigurator.CreateDbAndTable(configuration);
+        Console.WriteLine(configuration.DbConnectionString);
+        app.Logger.LogInformation("Database initiated");
 
         //Console.WriteLine("Downloading tags started");
         app.Logger.LogInformation("Downloading tags started");
