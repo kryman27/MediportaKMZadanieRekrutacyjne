@@ -1,11 +1,55 @@
 ﻿using MediportaKMZadanieRekrutacyjne.Database;
 using MediportaKMZadanieRekrutacyjne.Models;
 using MediportaKMZadanieRekrutacyjne.Services;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 
 namespace MediportaKMZadanieRekrutacyjne.Config
 {
     public static class InitialConfigurator
     {
+        public static void CreateDbAndTable(Configuration config)
+        {
+            try
+            {
+                if (config.FirstLaunchFlag)
+                {
+                    //string rawSql = "CREATE DATABASE SODB;\r\nGO\r\nUSE SODB;\r\nGO\r\nCREATE TABLE [dbo].[Tags] (\r\n    [TagID]                INT            IDENTITY (1, 1) NOT NULL,\r\n    [HasSynonyms]          BIT            NOT NULL,\r\n    [IsModeratorOnly]      BIT            NOT NULL,\r\n    [IsRequired]           BIT            NOT NULL,\r\n    [Count]                INT            NOT NULL,\r\n    [Name]                 NVARCHAR (MAX) NULL,\r\n    [PopulationPercentage] DECIMAL (7, 5) NULL\r\n);\r\nGO";
+
+                    string createDBquery = "CREATE DATABASE SODB;";
+                    string createTableQuery = "USE SODB; CREATE TABLE [dbo].[Tags] ([TagID] INT IDENTITY (1, 1) NOT NULL, [HasSynonyms] BIT NOT NULL, [IsModeratorOnly] BIT NOT NULL, [IsRequired] BIT NOT NULL, [Count] INT NOT NULL, [Name] NVARCHAR (MAX) NULL, [PopulationPercentage] DECIMAL (7, 5) NULL);";
+
+                    using (SoApiDbContext dbCtx = new())
+                    {
+                        dbCtx.Database.SetConnectionString(config.SQLServerConnectionString);
+                        
+                        if(!dbCtx.Database.CanConnect())
+                        {
+                            dbCtx.Database.ExecuteSqlRaw(createDBquery);
+                            dbCtx.SaveChanges();
+                        }
+
+                        dbCtx.Database.ExecuteSqlRaw(createTableQuery);
+                        dbCtx.SaveChanges();
+                    }
+
+                    //using (SqlConnection connection = new SqlConnection(config.SQLServerConnectionString))
+                    //{
+                    //    connection.Open();
+
+                    //    using(SqlCommand command = new(rawSql, connection))
+                    //    {
+                    //        var temp = command.ExecuteNonQuery();
+                    //    }
+                    //}
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
         /// <summary>
         /// Method allows to retrive TAGS from StackExchangeAPI
         /// </summary>
@@ -15,7 +59,7 @@ namespace MediportaKMZadanieRekrutacyjne.Config
             {
                 List<Tag> tags = new();
                 bool hasMoreFlag = true;
-                
+
                 //TODO - this should not be hardcoded here as 24!
                 int currentPage = ConfigurationManager.GetInstance().appConfiguration.CurrentPage;
                 int pagesLimiter = currentPage + 50;
@@ -62,21 +106,28 @@ namespace MediportaKMZadanieRekrutacyjne.Config
 
         public static void CalculateTagsPercentage()
         {
-            int totalTagsCount;
-
-            using(SoApiDbContext dbCtx = new())
+            try
             {
-                totalTagsCount = dbCtx.Tags.Sum(t => t.Count);
+                int totalTagsCount;
 
-                var tags = dbCtx.Tags;
-
-                foreach (var tag in tags)
+                using (SoApiDbContext dbCtx = new())
                 {
-                    tag.PopulationPercentage = Math.Round(((decimal)tag.Count / (decimal)totalTagsCount) * 100.00m, 5);
+                    totalTagsCount = dbCtx.Tags.Sum(t => t.Count);
 
-                    dbCtx.Tags.Update(tag);
+                    var tags = dbCtx.Tags;
+
+                    foreach (var tag in tags)
+                    {
+                        tag.PopulationPercentage = Math.Round(((decimal)tag.Count / (decimal)totalTagsCount) * 100.00m, 5);
+
+                        dbCtx.Tags.Update(tag);
+                    }
+                    dbCtx.SaveChanges();
                 }
-                dbCtx.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
             }
         }
     }

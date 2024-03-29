@@ -24,4 +24,10 @@
     <Folder Include="Crypto\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="appConfig.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

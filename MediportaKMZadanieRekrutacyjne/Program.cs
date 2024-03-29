@@ -38,6 +38,8 @@ public class Program
         //initial checking of tags database and retrive data from StackExchangeAPI
         var configuration = MediportaKMZadanieRekrutacyjne.Config.ConfigurationManager.GetInstance().appConfiguration;
 
+        InitialConfigurator.CreateDbAndTable(configuration);
+
         //Console.WriteLine("Downloading tags started");
         app.Logger.LogInformation("Downloading tags started");
         Stopwatch stopwatch = new Stopwatch();

@@ -22,17 +22,18 @@ namespace MediportaKMZadanieRekrutacyjne.Config
             var apiKey = root.GetProperty("ApiKey").GetString();
             var connectionString = root.GetProperty("DbConnectionString").GetString();
             var currentPage = root.GetProperty("CurrentPage").GetInt32();
+            var initialServerConnectionString = root.GetProperty("SQLServerConnectionString").GetString();
 
             var apiUrl = apiUrlRaw.Replace("APIKEYVALUE", apiKey);
 
-            appConfiguration = new Configuration(firstLaunchFlag, apiKey, connectionString, apiUrl, currentPage);
+            appConfiguration = new Configuration(firstLaunchFlag, apiKey, initialServerConnectionString, connectionString, apiUrl, currentPage);
         }
 
         public static ConfigurationManager GetInstance()
         {
             if (_instance == null)
             {
-                lock(_lock)
+                lock (_lock)
                 {
                     _instance = new ConfigurationManager();
                     return _instance;
@@ -60,7 +61,7 @@ namespace MediportaKMZadanieRekrutacyjne.Config
             File.Delete(configPath);
 
             var temp = _instance.appConfiguration;
-            var newConfig = new Configuration(false, temp.ApiKey, temp.DbConnectionString, temp.ApiUrl, temp.CurrentPage);
+            var newConfig = new Configuration(false, temp.ApiKey, temp.SQLServerConnectionString, temp.DbConnectionString, temp.ApiUrl, temp.CurrentPage);
 
             File.WriteAllText(configPath, JsonSerializer.Serialize(newConfig));
         }
