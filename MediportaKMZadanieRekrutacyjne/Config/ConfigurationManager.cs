@@ -1,8 +1,14 @@
-﻿using MediportaKMZadanieRekrutacyjne.Models;
+﻿using MediportaKMZadanieRekrutacyjne.Crypto;
+using MediportaKMZadanieRekrutacyjne.Models;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Text.Json;
 
 namespace MediportaKMZadanieRekrutacyjne.Config
 {
+    /// <summary>
+    /// Singleton class for reading and managing configuration
+    /// </summary>
     public class ConfigurationManager
     {
         public Configuration appConfiguration { get; set; }
@@ -19,13 +25,15 @@ namespace MediportaKMZadanieRekrutacyjne.Config
 
             var apiUrlRaw = root.GetProperty("ApiUrl").GetString();
             var firstLaunchFlag = root.GetProperty("FirstLaunchFlag").GetBoolean();
-            var apiKey = root.GetProperty("ApiKey").GetString();
+            var apiKeyEncrypted = root.GetProperty("ApiKey").GetString();
             var connectionString = root.GetProperty("DbConnectionString").GetString();
             var currentPage = root.GetProperty("CurrentPage").GetInt32();
 
-            var apiUrl = apiUrlRaw.Replace("APIKEYVALUE", apiKey);
+            var apiKeyDecrypted = Decrypter.DecryptKey(apiKeyEncrypted);
 
-            appConfiguration = new Configuration(firstLaunchFlag, apiKey, connectionString, apiUrl, currentPage);
+            var apiUrl = apiUrlRaw.Replace("APIKEYVALUE", apiKeyDecrypted);
+
+            appConfiguration = new Configuration(firstLaunchFlag, apiKeyDecrypted, connectionString, apiUrl, currentPage);
         }
 
         public static ConfigurationManager GetInstance()
@@ -42,16 +50,10 @@ namespace MediportaKMZadanieRekrutacyjne.Config
                 return _instance;
         }
 
-        //private string DecryptKey(string encryptedKey)
-        //{
-        //    string decryptedKey = string.Empty;
 
-        //    //TODO - decrypting logic needed here
-
-
-        //    return decryptedKey;
-        //}
-
+        /// <summary>
+        /// Saves current configuration to config file
+        /// </summary>
         public static void ChangeConfigurationFile()
         {
             var appPath = AppDomain.CurrentDomain.BaseDirectory;

@@ -117,7 +117,7 @@ namespace MediportaKMZadanieRekrutacyjne.Controllers
                     dbCtx.Tags.AddRange(tags);
                     dbCtx.SaveChanges();
 
-                    InitialConfigurator.CalculateTagsPercentage(logger);
+                    new InitialConfigurator().CalculateTagsPercentage<SoApiDbContext>(dbCtx);
 
                     logger.LogInformation($"Tags updated: {tags.Count}");
 

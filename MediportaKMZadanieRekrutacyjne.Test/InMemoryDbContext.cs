@@ -1,28 +1,24 @@
 ﻿using MediportaKMZadanieRekrutacyjne.Interfaces;
 using MediportaKMZadanieRekrutacyjne.Models;
 using Microsoft.EntityFrameworkCore;
-using ConfigurationManager = MediportaKMZadanieRekrutacyjne.Config.ConfigurationManager;
+using System;
+using System.Collections.Generic;
+using System.Formats.Asn1;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace MediportaKMZadanieRekrutacyjne.Database
+namespace MediportaKMZadanieRekrutacyjne.Test
 {
-    public class SoApiDbContext : DbContext, IDbCtx
+    public class InMemoryDbContext : DbContext, IDbCtx
     {
-        private Configuration appConfiguration;
-
-        public SoApiDbContext()
-        {
-            appConfiguration = ConfigurationManager.GetInstance().appConfiguration;
-        }
-
-        public SoApiDbContext(DbContextOptions<SoApiDbContext> options) : base(options)
-        {
-
-        }
+        public InMemoryDbContext() { }
+        public InMemoryDbContext(DbContextOptions<InMemoryDbContext> options) : base(options) { }
 
         public virtual DbSet<Tag> Tags { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
-            optionsBuilder.UseSqlServer(appConfiguration.DbConnectionString);
+            optionsBuilder.UseInMemoryDatabase("sodbTest");
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

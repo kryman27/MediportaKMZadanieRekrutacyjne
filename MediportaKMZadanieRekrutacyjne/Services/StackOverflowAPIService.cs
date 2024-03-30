@@ -14,6 +14,11 @@ namespace MediportaKMZadanieRekrutacyjne.Services
             logger = loggerFactory.CreateLogger<APIResponseModel>();
         }
 
+        /// <summary>
+        /// Method for retriving data from Stack Exchange API
+        /// </summary>
+        /// <param name="pageNumber"></param>
+        /// <returns>Task<APIResponseModel></returns>
         public async Task<APIResponseModel> GetTags(int pageNumber)
         {
             APIResponseModel result = null;

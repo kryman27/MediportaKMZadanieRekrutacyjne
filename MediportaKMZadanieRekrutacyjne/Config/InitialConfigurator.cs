@@ -1,12 +1,21 @@
 ﻿using MediportaKMZadanieRekrutacyjne.Database;
+using MediportaKMZadanieRekrutacyjne.Interfaces;
 using MediportaKMZadanieRekrutacyjne.Models;
 using MediportaKMZadanieRekrutacyjne.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace MediportaKMZadanieRekrutacyjne.Config
 {
-    public static class InitialConfigurator
+    public class InitialConfigurator
     {
-        public static void CreateDbAndTable(Configuration config, ILogger logger)
+        private static ILogger logger = new LoggerFactory().CreateLogger<InitialConfigurator>();
+
+        /// <summary>
+        /// Method checks if database exists, and create it if necessarry, due to entities registered in SoApiDbContext
+        /// </summary>
+        /// <param name="config"></param>
+        /// <param name="logger"></param>
+        public void CreateDbAndTable(Configuration config, ILogger logger)
         {
             try
             {
@@ -22,79 +31,78 @@ namespace MediportaKMZadanieRekrutacyjne.Config
         }
 
         /// <summary>
-        /// Method allows to retrive TAGS from StackExchangeAPI
+        /// Method allows to retrive TAGS from StackExchangeAPI and add them to database
         /// </summary>
-        public static void CheckDbRetriveDataFromApi(Configuration config, ILogger loggger)
+        public void CheckDbRetriveDataFromApi<T>(T dbCtx, int limit) where T : DbContext, IDbCtx
         {
             try
             {
                 List<Tag> tags = new();
                 bool hasMoreFlag = true;
 
-                //TODO - this should not be hardcoded here as 24!
                 int currentPage = ConfigurationManager.GetInstance().appConfiguration.CurrentPage;
-                int pagesLimiter = currentPage + 50;
+                int pagesLimiter = currentPage + limit;
 
-                using (SoApiDbContext dbCtx = new())
+                if (ConfigurationManager.GetInstance().appConfiguration.FirstLaunchFlag || dbCtx.Tags.Count() == 0)
                 {
-                    if (ConfigurationManager.GetInstance().appConfiguration.FirstLaunchFlag || dbCtx.Tags.Count() == 0)
+                    var soService = new StackOverflowAPIService();
+
+                    //TODO - consider second condition, is this constriction neccessary?
+                    while (hasMoreFlag && currentPage <= pagesLimiter)
                     {
-                        var soService = new StackOverflowAPIService();
+                        var retrievedTags = soService.GetTags(currentPage);
 
-                        //TODO - consider second condition, is this constriction neccessary?
-                        while (hasMoreFlag && currentPage <= pagesLimiter)
+                        foreach (var rt in retrievedTags.Result.Items)
                         {
-                            var retrievedTags = soService.GetTags(currentPage);
-
-                            foreach (var rt in retrievedTags.Result.Items)
+                            Tag temp = new Tag
                             {
-                                Tag temp = new Tag
-                                {
-                                    HasSynonyms = rt.HasSynonyms,
-                                    IsModeratorOnly = rt.IsModeratorOnly,
-                                    IsRequired = rt.IsRequired,
-                                    Count = rt.Count,
-                                    Name = rt.Name,
-                                };
+                                HasSynonyms = rt.HasSynonyms,
+                                IsModeratorOnly = rt.IsModeratorOnly,
+                                IsRequired = rt.IsRequired,
+                                Count = rt.Count,
+                                Name = rt.Name,
+                            };
 
-                                tags.Add(temp);
-                            }
-                            hasMoreFlag = retrievedTags.Result.HasMore;
-                            currentPage++;
+                            tags.Add(temp);
                         }
-
-                        dbCtx.Tags.AddRange(tags);
-                        dbCtx.SaveChanges();
-                        ConfigurationManager.GetInstance().appConfiguration.CurrentPage = currentPage;
+                        hasMoreFlag = retrievedTags.Result.HasMore;
+                        currentPage++;
                     }
+
+                    dbCtx.Tags.AddRange(tags);
+                    dbCtx.SaveChanges();
+                    ConfigurationManager.GetInstance().appConfiguration.CurrentPage = currentPage;
                 }
             }
             catch (Exception ex)
             {
-                loggger.LogError(ex.Message);
+                logger.LogError(ex.Message);
             }
         }
 
-        public static void CalculateTagsPercentage(ILogger logger)
+        /// <summary>
+        /// Calculates percentage of every tag in whole db population
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dbCtx"></param>
+        public void CalculateTagsPercentage<T>(T dbCtx) where T : DbContext, IDbCtx
         {
             try
             {
                 int totalTagsCount;
 
-                using (SoApiDbContext dbCtx = new())
+                totalTagsCount = dbCtx.Tags.Sum(t => t.Count);
+
+                var tags = dbCtx.Tags;
+
+                foreach (var tag in tags)
                 {
-                    totalTagsCount = dbCtx.Tags.Sum(t => t.Count);
+                    tag.PopulationPercentage = Math.Round(((decimal)tag.Count / (decimal)totalTagsCount) * 100.00m, 5);
 
-                    var tags = dbCtx.Tags;
-
-                    foreach (var tag in tags)
-                    {
-                        tag.PopulationPercentage = Math.Round(((decimal)tag.Count / (decimal)totalTagsCount) * 100.00m, 5);
-
-                        dbCtx.Tags.Update(tag);
-                    }
-                    dbCtx.SaveChanges();
+                    dbCtx.Tags.Update(tag);
                 }
+                dbCtx.SaveChanges();
+
             }
             catch (Exception ex)
             {

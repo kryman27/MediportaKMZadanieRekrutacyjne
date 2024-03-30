@@ -1,4 +1,4 @@
-﻿namespace MediportaKMZadanieRekrutacyjne.Controllers
+﻿namespace MediportaKMZadanieRekrutacyjne.Models
 {
     public enum SortBy
     {
