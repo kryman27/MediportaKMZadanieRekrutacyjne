@@ -1,38 +1,30 @@
 ﻿using MediportaKMZadanieRekrutacyjne.Database;
 using MediportaKMZadanieRekrutacyjne.Models;
 using MediportaKMZadanieRekrutacyjne.Services;
-using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.IdentityModel.Tokens;
 
 namespace MediportaKMZadanieRekrutacyjne.Config
 {
     public static class InitialConfigurator
     {
-        public static void CreateDbAndTable(Configuration config)
+        public static void CreateDbAndTable(Configuration config, ILogger logger)
         {
             try
             {
-                if (config.FirstLaunchFlag)
+                using (SoApiDbContext dbCtx = new())
                 {
-                    using (SoApiDbContext dbCtx = new())
-                    {
-                        var dbCreateFlag = dbCtx.Database.EnsureCreated();
-                    }
+                    var dbCreateFlag = dbCtx.Database.EnsureCreated();
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                logger.LogError(ex.Message);
             }
         }
 
         /// <summary>
         /// Method allows to retrive TAGS from StackExchangeAPI
         /// </summary>
-        public static void CheckDbRetriveDataFromApi(Configuration config)
+        public static void CheckDbRetriveDataFromApi(Configuration config, ILogger loggger)
         {
             try
             {
@@ -79,11 +71,11 @@ namespace MediportaKMZadanieRekrutacyjne.Config
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                loggger.LogError(ex.Message);
             }
         }
 
-        public static void CalculateTagsPercentage()
+        public static void CalculateTagsPercentage(ILogger logger)
         {
             try
             {
@@ -106,7 +98,7 @@ namespace MediportaKMZadanieRekrutacyjne.Config
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                logger.LogError(ex.Message);
             }
         }
     }

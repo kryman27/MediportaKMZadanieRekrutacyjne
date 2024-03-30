@@ -1,6 +1,6 @@
 @MediportaKMZadanieRekrutacyjne_HostAddress = http://localhost:5276
 
-GET {{MediportaKMZadanieRekrutacyjne_HostAddress}}/weatherforecast/
+GET {{MediportaKMZadanieRekrutacyjne_HostAddress}}/stack-overflow/
 Accept: application/json
 
 ###

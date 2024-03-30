@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 namespace MediportaKMZadanieRekrutacyjne.Controllers
 {
     [ApiController]
-    [Route("stack-overflow")]
+    [Route("api")]
     public class StackOverflowController : ControllerBase
     {
 
@@ -17,6 +17,13 @@ namespace MediportaKMZadanieRekrutacyjne.Controllers
         public StackOverflowController(ILogger<StackOverflowController> logger)
         {
             this.logger = logger;
+        }
+
+        [HttpGet]
+        [Route("test")]
+        public IResult Test()
+        {
+            return Results.Ok("hello");
         }
 
         [HttpGet]
@@ -68,7 +75,6 @@ namespace MediportaKMZadanieRekrutacyjne.Controllers
             }
         }
 
-        //TODO - metoda wymuszająca ponowne pobranie tagów
         [HttpPost]
         [Route("tags")]
         public IResult ForceTagsUpdate()
@@ -111,7 +117,7 @@ namespace MediportaKMZadanieRekrutacyjne.Controllers
                     dbCtx.Tags.AddRange(tags);
                     dbCtx.SaveChanges();
 
-                    InitialConfigurator.CalculateTagsPercentage();
+                    InitialConfigurator.CalculateTagsPercentage(logger);
 
                     logger.LogInformation($"Tags updated: {tags.Count}");
 

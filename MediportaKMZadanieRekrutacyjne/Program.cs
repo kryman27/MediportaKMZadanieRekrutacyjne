@@ -1,7 +1,6 @@
 using MediportaKMZadanieRekrutacyjne.Config;
 using MediportaKMZadanieRekrutacyjne.Services;
 using System.Diagnostics;
-using Microsoft.Extensions.Logging;
 using System.Text.Json.Serialization;
 
 public class Program
@@ -39,36 +38,35 @@ public class Program
         var configuration = MediportaKMZadanieRekrutacyjne.Config.ConfigurationManager.GetInstance().appConfiguration;
 
         app.Logger.LogInformation("Database initiating started");
-        InitialConfigurator.CreateDbAndTable(configuration);
-        Console.WriteLine(configuration.DbConnectionString);
+        InitialConfigurator.CreateDbAndTable(configuration, app.Logger);
         app.Logger.LogInformation("Database initiated");
 
-        //Console.WriteLine("Downloading tags started");
-        app.Logger.LogInformation("Downloading tags started");
+        app.Logger.LogInformation("Tags data download in progress");
         Stopwatch stopwatch = new Stopwatch();
         stopwatch.Start();
-        InitialConfigurator.CheckDbRetriveDataFromApi(configuration);
+        
+        if (configuration.FirstLaunchFlag == true)
+        {
+            InitialConfigurator.CheckDbRetriveDataFromApi(configuration, app.Logger);
+        }
+        else
+        {
+            app.Logger.LogInformation("Database already exists");
+        }
         stopwatch.Stop();
         var timeElapsed = stopwatch.Elapsed.TotalSeconds;
-        //Console.WriteLine($"Download completed in {timeElapsed} seconds");
-        app.Logger.LogInformation($"Download completed in {timeElapsed} seconds");
 
+        app.Logger.LogInformation($"Data download completed in {timeElapsed} seconds");
         stopwatch.Reset();
+
+        app.Logger.LogInformation($"Calculation tags percentage");
         stopwatch.Start();
         MediportaKMZadanieRekrutacyjne.Config.ConfigurationManager.ChangeConfigurationFile();
         stopwatch.Stop();
         timeElapsed = stopwatch.Elapsed.TotalSeconds;
         app.Logger.LogInformation($"Percentage calculated in {timeElapsed} seconds");
 
-        //calculate tag's percentage in population
-        InitialConfigurator.CalculateTagsPercentage();
-
-        //uruchomDrugiProgramCoDoci¹gaTagi(configuration)
-        //Process process = new Process();
-        //process.StartInfo.FileName = "cmd.exe";
-        //process.StartInfo.Arguments = $"/C {Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TagsDownloader.exe")}";
-        //process.StartInfo.UseShellExecute = true;
-        //process.Start();
+        InitialConfigurator.CalculateTagsPercentage(app.Logger);
 
         app.Run();
     }

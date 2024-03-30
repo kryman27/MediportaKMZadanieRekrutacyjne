@@ -1,8 +1,7 @@
 {
   "FirstLaunchFlag": true,
   "ApiKey": "Hcl6TN1VjfObT)ahuHhKMA((",
-  "SQLServerConnectionString": "Server=172.17.0.1:1433;User ID=sa;Password=Admin1234;Encrypt=False;TrustServerCertificate=True",
-  "DbConnectionString": "Server=localhost,1433;Database=SODB;User ID=sa;Password=Admin1234;Encrypt=False;TrustServerCertificate=True",
+  "DbConnectionString": "Server=172.17.0.1, 1433;Database=SODB;User ID=sa;Password=Admin1234;Encrypt=False;TrustServerCertificate=True",
   "ApiUrl": "https://api.stackexchange.com/2.3/tags?page=PAGENUMBERVALUE&order=asc&sort=name&site=stackoverflow&key=APIKEYVALUE",
   "CurrentPage": 1
 }
