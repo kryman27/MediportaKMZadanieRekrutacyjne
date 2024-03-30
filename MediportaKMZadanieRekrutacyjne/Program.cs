@@ -1,9 +1,7 @@
 using MediportaKMZadanieRekrutacyjne.Config;
-using MediportaKMZadanieRekrutacyjne.Crypto;
 using MediportaKMZadanieRekrutacyjne.Database;
 using MediportaKMZadanieRekrutacyjne.Services;
 using System.Diagnostics;
-using System.Reflection.Metadata;
 using System.Text.Json.Serialization;
 
 public class Program
@@ -16,7 +14,7 @@ public class Program
         builder.Services.AddControllers()
             .AddJsonOptions(options =>
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
-        
+
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
         builder.Services.AddSingleton<StackOverflowAPIService>();
@@ -55,7 +53,7 @@ public class Program
         stopwatch.Stop();
         var timeElapsed = stopwatch.Elapsed.TotalSeconds;
         app.Logger.LogInformation($"Data download completed in {timeElapsed} seconds");
-        
+
         stopwatch.Reset();
         app.Logger.LogInformation($"Calculation tags percentage");
         stopwatch.Start();

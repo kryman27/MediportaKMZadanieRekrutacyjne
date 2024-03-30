@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace MediportaKMZadanieRekrutacyjne.Models
+﻿namespace MediportaKMZadanieRekrutacyjne.Models
 {
     public class Tag
     {
@@ -10,6 +8,6 @@ namespace MediportaKMZadanieRekrutacyjne.Models
         public bool IsRequired { get; set; }
         public int Count { get; set; }
         public string? Name { get; set; }
-        public decimal? PopulationPercentage {  get; set; }
+        public decimal? PopulationPercentage { get; set; }
     }
 }

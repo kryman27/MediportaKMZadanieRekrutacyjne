@@ -1,7 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using System.Security.Cryptography;
-
-namespace MediportaKMZadanieRekrutacyjne.Crypto
+﻿namespace MediportaKMZadanieRekrutacyjne.Crypto
 {
     public static class Decrypter
     {
@@ -14,7 +11,7 @@ namespace MediportaKMZadanieRekrutacyjne.Crypto
         {
             var decryptedKey = string.Empty;
 
-            foreach(char c in encryptedText)
+            foreach (char c in encryptedText)
             {
                 decryptedKey += Convert.ToChar(c + 1);
             }
