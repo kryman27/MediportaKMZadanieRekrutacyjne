@@ -20,13 +20,6 @@ namespace MediportaKMZadanieRekrutacyjne.Controllers
         }
 
         [HttpGet]
-        [Route("test")]
-        public IResult Test()
-        {
-            return Results.Ok("hello");
-        }
-
-        [HttpGet]
         [Route("tags")]
         public IResult GetTags([FromQuery] int tagsPerPage, [FromQuery] int pageNumber, [FromQuery] SortBy sortBy, [FromQuery] SortOrder sortOrder)
         {
